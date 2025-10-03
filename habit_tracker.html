@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker</title>
+    <meta name="theme-color" content="#5C3D2E"/>
+    <link rel="manifest" href="data:application/manifest+json,{
+        &quot;name&quot;: &quot;Habit Tracker&quot;,
+        &quot;short_name&quot;: &quot;Habits&quot;,
+        &quot;start_url&quot;: &quot;.&quot;,
+        &quot;display&quot;: &quot;standalone&quot;,
+        &quot;background_color&quot;: &quot;#FFF7F0&quot;,
+        &quot;description&quot;: &quot;A gentle, minimalist habit tracker.&quot;,
+        &quot;icons&quot;: [{
+            &quot;src&quot;: &quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192' fill='%235C3D2E' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' fill='none'%3E%3C/rect%3E%3Cpath d='M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144Z' opacity='0.2'%3E%3C/path%3E%3Cpath d='M88,112a8,8,0,0,1,8,8v80a8,8,0,0,1-16,0V120A8,8,0,0,1,88,112Zm48,0a8,8,0,0,1,8,8v80a8,8,0,0,1-16,0V120A8,8,0,0,1,136,112Zm48,0a8,8,0,0,1,8,8v80a8,8,0,0,1-16,0V120A8,8,0,0,1,184,112Zm40-80H40a8,8,0,0,0-8,8V208a8,8,0,0,0,8,8H224a8,8,0,0,0,8-8V40A8,8,0,0,0,224,32Zm-8,168H48V48H216Z'%3E%3C/path%3E%3C/svg%3E&quot;,
+            &quot;sizes&quot;: &quot;192x192&quot;,
+            &quot;type&quot;: &quot;image/svg+xml&quot;
+        }, {
+            &quot;src&quot;: &quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512' fill='%235C3D2E' viewBox='0 0 256 256'%3E%3Crect width='256' height='256' fill='none'%3E%3C/rect%3E%3Cpath d='M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144Z' opacity='0.2'%3E%3C/path%3E%3Cpath d='M88,112a8,8,0,0,1,8,8v80a8,8,0,0,1-16,0V120A8,8,0,0,1,88,112Zm48,0a8,8,0,0,1,8,8v80a8,8,0,0,1-16,0V120A8,8,0,0,1,136,112Zm48,0a8,8,0,0,1,8,8v80a8,8,0,0,1-16,0V120A8,8,0,0,1,184,112Zm40-80H40a8,8,0,0,0-8,8V208a8,8,0,0,0,8,8H224a8,8,0,0,0,8-8V40A8,8,0,0,0,224,32Zm-8,168H48V48H216Z'%3E%3C/path%3E%3C/svg%3E&quot;,
+            &quot;sizes&quot;: &quot;512x512&quot;,
+            &quot;type&quot;: &quot;image/svg+xml&quot;
+        }]
+    }"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-1: #EF4444; --color-2: #F97316; --color-3: #EAB308;
+            --color-4: #22C55E; --color-5: #3B82F6; --color-6: #8B5CF6;
+            --color-7: #EC4899; --color-8: #14B8A6;
+        }
+        body { font-family: 'Lora', serif; -webkit-tap-highlight-color: transparent; }
+        .theme-warm { --bg-primary: #FFF7F0; --bg-card: #FFFFFF; --text-dark: #5C3D2E; --text-light: #A89B8F; --border-stroke: #EAE2D9; }
+        .theme-cool { --bg-primary: #F0F7FF; --bg-card: #FFFFFF; --text-dark: #2E4A5C; --text-light: #8F9BA8; --border-stroke: #D9E2EA; }
+        .theme-mono { --bg-primary: #F5F5F5; --bg-card: #FFFFFF; --text-dark: #212121; --text-light: #757575; --border-stroke: #E0E0E0; }
+        .bg-primary { background-color: var(--bg-primary); } .bg-card { background-color: var(--bg-card); }
+        .text-dark { color: var(--text-dark); } .text-light { color: var(--text-light); }
+        .border-stroke { border-color: var(--border-stroke); }
+        .habit-tracker-circle { width: 24px; height: 24px; border: 2px solid var(--border-stroke); border-radius: 9999px; cursor: pointer; transition: all 0.2s; }
+        .habit-tracker-circle.filled { border-width: 0; transform: scale(1.1); }
+        .current-day-ring { box-shadow: 0 0 0 2px var(--color-5); }
+        .focus-ring:focus { outline: none; box-shadow: 0 0 0 3px var(--color-2); }
+        .designed-outline {
+            border: 2px solid var(--text-dark);
+            box-shadow: 3px 3px 0px 0px var(--text-dark);
+            transition: all 0.2s ease-in-out;
+        }
+        .designed-outline:hover { box-shadow: 1px 1px 0px 0px var(--text-dark); }
+        .habit-card-background {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-primary));
+        }
+        .modal { transition: opacity 0.3s; }
+        .modal-content { transition: all 0.3s; }
+        .calendar-day { min-height: 60px; }
+        .modal.open { opacity: 1; pointer-events: auto; }
+        .modal.open .modal-content { transform: scale(1); opacity: 1; }
+        #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1000; }
+    </style>
+</head>
+<body class="bg-primary text-dark habit-colors">
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <div id="app" class="max-w-md mx-auto p-4 sm:p-6 min-h-screen">
+        
+        <header class="text-center py-8 relative flex items-center justify-center">
+             <button id="reviewBtn" class="absolute top-8 left-0 p-2 text-light hover:text-dark" title="Monthly Review">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256"><path d="M224,208H32a8,8,0,0,0-8,8v8a8,8,0,0,0,8,8H224a8,8,0,0,0,8-8v-8A8,8,0,0,0,224,208ZM80,184a8,8,0,0,1-8-8V120a8,8,0,0,1,16,0v56A8,8,0,0,1,80,184Zm48,0a8,8,0,0,1-8-8V88a8,8,0,0,1,16,0v88A8,8,0,0,1,128,184Zm48,0a8,8,0,0,1-8-8V40a8,8,0,0,1,16,0V176A8,8,0,0,1,176,184Z"></path></svg>
+             </button>
+            <div class="flex flex-col">
+                <h1 class="text-3xl font-bold tracking-tight">Habit Tracker</h1>
+                <p id="currentDate" class="text-light mt-2 text-lg"></p>
+            </div>
+            <button id="settingsBtn" class="absolute top-8 right-0 p-2 text-light hover:text-dark" title="Settings">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256"><path d="M216.49,113.23l-12.2-1.92a48.2,48.2,0,0,0-19.5-19.5l1.92-12.2a16,16,0,0,0-9.87-17.38l-11.31-6.53a16,16,0,0,0-17.38,9.87l-1.92,12.2a48.2,48.2,0,0,0-19.5,19.5l-12.2-1.92a16,16,0,0,0-17.38,9.87l-6.53,11.31a16,16,0,0,0,9.87,17.38l12.2,1.92a48.2,48.2,0,0,0,19.5,19.5l-1.92,12.2a16,16,0,0,0,9.87,17.38l11.31,6.53a16,16,0,0,0,17.38-9.87l1.92-12.2a48.2,48.2,0,0,0,19.5-19.5l12.2,1.92a16,16,0,0,0,17.38-9.87l6.53-11.31A16,16,0,0,0,216.49,113.23ZM128,160a32,32,0,1,1,32-32A32,32,0,0,1,128,160Z"></path></svg>
+            </button>
+        </header>
+
+        <div class="text-center mb-8">
+            <button id="viewToggleBtn" class="bg-card border border-stroke px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary transition-colors">
+                Switch to Calendar View
+            </button>
+        </div>
+
+        <main id="mainContent">
+            <div id="listView">
+                <div id="habitsList" class="space-y-4"></div>
+            </div>
+            <div id="calendarView" class="hidden">
+                 <div class="flex justify-between items-center mb-4 px-2">
+                    <button id="prevMonthBtn" class="p-2 rounded-full hover:bg-card transition-colors">&lt;</button>
+                    <h2 id="monthYearHeader" class="text-lg font-semibold"></h2>
+                    <button id="nextMonthBtn" class="p-2 rounded-full hover:bg-card transition-colors">&gt;</button>
+                </div>
+                <div id="calendarDayHeaders" class="grid grid-cols-7 text-center text-xs text-light mb-2 px-1">
+                    <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+                </div>
+                <div id="calendarGrid" class="grid grid-cols-7 gap-1 bg-card p-2 rounded-lg designed-outline"></div>
+            </div>
+        </main>
+        
+        <section id="addHabitSection" class="bg-card p-4 rounded-2xl designed-outline mt-8">
+             <h2 class="font-semibold text-lg mb-3 text-center">Add a new habit</h2>
+            <form id="addHabitForm" class="flex flex-col gap-4">
+                <div class="flex items-center space-x-3">
+                    <input type="text" id="habitEmoji" placeholder="✨" maxlength="2" class="w-16 h-12 text-2xl text-center bg-primary rounded-lg focus-ring">
+                    <input type="text" id="habitName" placeholder="e.g. Read a chapter" required class="flex-grow h-12 px-4 bg-primary rounded-lg focus-ring">
+                </div>
+                <h4 class="text-sm font-medium text-light text-center -mb-2">Choose an Emoji</h4>
+                <div id="emojiSuggestions" class="bg-primary p-2 rounded-lg flex flex-wrap justify-center gap-1 border border-stroke">
+                    <button type="button" class="text-2xl p-2 rounded-lg hover:bg-white transition-colors text-dark">📖</button>
+                    <button type="button" class="text-2xl p-2 rounded-lg hover:bg-white transition-colors text-dark">💧</button>
+                    <button type="button" class="text-2xl p-2 rounded-lg hover:bg-white transition-colors text-dark">🧘</button>
+                    <button type="button" class="text-2xl p-2 rounded-lg hover:bg-white transition-colors text-dark">🚶</button>
+                    <button type="button" class="text-2xl p-2 rounded-lg hover:bg-white transition-colors text-dark">🎨</button>
+                    <button type="button" class="text-2xl p-2 rounded-lg hover:bg-white transition-colors text-dark">🎵</button>
+                    <button type="button" class="text-2xl p-2 rounded-lg hover:bg-white transition-colors text-dark">🌱</button>
+                    <button type="button" class="text-2xl p-2 rounded-lg hover:bg-white transition-colors text-dark">☀️</button>
+                    <button type="button" class="text-2xl p-2 rounded-lg hover:bg-white transition-colors text-dark">📝</button>
+                    <button type="button" class="text-2xl p-2 rounded-lg hover:bg-white transition-colors text-dark">😊</button>
+                    <button type="button" class="text-2xl p-2 rounded-lg hover:bg-white transition-colors text-dark">💻</button>
+                    <button type="button" class="text-2xl p-2 rounded-lg hover:bg-white transition-colors text-dark">💪</button>
+                </div>
+                <div id="colorPalette" class="flex justify-center space-x-2"></div>
+                <button type="submit" class="w-full bg-dark text-white font-semibold py-3 rounded-lg hover:opacity-90 transition-opacity">Add Habit</button>
+            </form>
+        </section>
+    </div>
+
+    <div id="dayModal" class="modal fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 opacity-0 pointer-events-none">
+        <div class="modal-content bg-card rounded-2xl p-6 w-full max-w-sm transform scale-95 opacity-0">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modalDateHeader" class="font-semibold text-lg text-dark"></h3>
+                <button id="closeModalBtn" class="text-2xl text-light hover:text-dark leading-none">&times;</button>
+            </div>
+            <div id="modalHabitsList" class="space-y-3 mb-4"></div>
+            <div>
+                <h4 class="text-sm font-medium text-light mb-2">Daily Note</h4>
+                <textarea id="dailyNote" class="w-full bg-primary rounded-lg p-3 h-24 focus-ring" placeholder="How was your day?"></textarea>
+            </div>
+        </div>
+    </div>
+    
+    <div id="settingsModal" class="modal fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 opacity-0 pointer-events-none">
+        <div class="modal-content bg-card rounded-2xl p-6 w-full max-w-sm transform scale-95 opacity-0">
+             <div class="flex justify-between items-center mb-6">
+                <h3 class="font-semibold text-lg text-dark">Settings</h3>
+                <button id="closeSettingsBtn" class="text-2xl text-light hover:text-dark leading-none">&times;</button>
+            </div>
+            <div class="space-y-6">
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="text-sm font-medium text-light">Theme</h4>
+                        <span id="currentThemeName" class="text-sm font-semibold text-dark capitalize"></span>
+                    </div>
+                    <div id="themeSelector" class="flex space-x-2"></div>
+                </div>
+                <div>
+                    <h4 class="text-sm font-medium text-light mb-2">Archived Habits</h4>
+                    <div id="archivedHabitsList" class="space-y-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+     <div id="reviewModal" class="modal fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 opacity-0 pointer-events-none">
+        <div class="modal-content bg-card rounded-2xl p-6 w-full max-w-sm transform scale-95 opacity-0">
+             <div class="flex justify-between items-center mb-4">
+                <h3 id="reviewHeader" class="font-semibold text-lg text-dark"></h3>
+                <button id="closeReviewBtn" class="text-2xl text-light hover:text-dark leading-none">&times;</button>
+            </div>
+            <div id="reviewContent" class="space-y-4"></div>
+        </div>
+    </div>
+
+    <div id="editHabitModal" class="modal fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 opacity-0 pointer-events-none">
+        <div class="modal-content bg-card rounded-2xl p-6 w-full max-w-sm transform scale-95 opacity-0">
+             <div class="flex justify-between items-center mb-4">
+                <h3 class="font-semibold text-lg text-dark">Edit Habit</h3>
+                <button id="closeEditModalBtn" class="text-2xl text-light hover:text-dark leading-none">&times;</button>
+            </div>
+            <form id="editHabitForm" class="flex flex-col gap-4">
+                <input type="hidden" id="editHabitId">
+                <div class="flex items-center space-x-3">
+                    <input type="text" id="editHabitEmoji" placeholder="✨" maxlength="2" class="w-16 h-12 text-2xl text-center bg-primary rounded-lg focus-ring">
+                    <input type="text" id="editHabitName" placeholder="e.g. Read a chapter" required class="flex-grow h-12 px-4 bg-primary rounded-lg focus-ring">
+                </div>
+                <h4 class="text-sm font-medium text-light text-center -mb-2">Choose an Emoji</h4>
+                <div id="editEmojiSuggestions" class="bg-primary p-2 rounded-lg flex flex-wrap justify-center gap-1 border border-stroke">
+                    <button type="button" class="text-2xl p-2 rounded-lg hover:bg-white transition-colors text-dark">📖</button>
+                    <button type="button" class="text-2xl p-2 rounded-lg hover:bg-white transition-colors text-dark">💧</button>
+                    <button type="button" class="text-2xl p-2 rounded-lg hover:bg-white transition-colors text-dark">🧘</button>
+                    <button type="button" class="text-2xl p-2 rounded-lg hover:bg-white transition-colors text-dark">🚶</button>
+                    <button type="button" class="text-2xl p-2 rounded-lg hover:bg-white transition-colors text-dark">🎨</button>
+                    <button type="button" class="text-2xl p-2 rounded-lg hover:bg-white transition-colors text-dark">🎵</button>
+                    <button type="button" class="text-2xl p-2 rounded-lg hover:bg-white transition-colors text-dark">🌱</button>
+                    <button type="button" class="text-2xl p-2 rounded-lg hover:bg-white transition-colors text-dark">☀️</button>
+                    <button type="button" class="text-2xl p-2 rounded-lg hover:bg-white transition-colors text-dark">📝</button>
+                    <button type="button" class="text-2xl p-2 rounded-lg hover:bg-white transition-colors text-dark">😊</button>
+                    <button type="button" class="text-2xl p-2 rounded-lg hover:bg-white transition-colors text-dark">💻</button>
+                    <button type="button" class="text-2xl p-2 rounded-lg hover:bg-white transition-colors text-dark">💪</button>
+                </div>
+                <div id="editColorPalette" class="flex justify-center space-x-2"></div>
+                <button type="submit" class="w-full bg-dark text-white font-semibold py-3 rounded-lg hover:opacity-90 transition-opacity">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+
+<script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('data:application/javascript,' + 'const CACHE_NAME="habit-tracker-cache-v1";const urlsToCache=["/"];' + 'self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(urlsToCache)))});' + 'self.addEventListener("fetch",e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)))});'
+        ).catch(error => console.log('ServiceWorker registration failed: ', error));
+    }
+    const App = {};
+</script>
+<script>
+    Object.assign(App, {
+        data: { habits: [], archivedHabits: [], notes: {}, settings: { theme: 'warm' } },
+        currentView: 'list', calendarDate: new Date(), elements: {},
+
+        init() {
+            this.cacheDOMElements();
+            this.loadData();
+            this.applyTheme();
+            this.registerEventListeners();
+            this.render();
+            this.updateDate();
+            this.renderColorPalette(this.elements.colorPalette);
+            this.renderColorPalette(this.elements.editColorPalette);
+        },
+
+        cacheDOMElements() {
+            const S = (selector) => document.querySelector(selector);
+            this.elements = {
+                currentDate: S('#currentDate'), viewToggleBtn: S('#viewToggleBtn'),
+                listView: S('#listView'), calendarView: S('#calendarView'),
+                habitsList: S('#habitsList'), monthYearHeader: S('#monthYearHeader'),
+                calendarGrid: S('#calendarGrid'), prevMonthBtn: S('#prevMonthBtn'),
+                nextMonthBtn: S('#nextMonthBtn'), addHabitForm: S('#addHabitForm'),
+                habitEmoji: S('#habitEmoji'), habitName: S('#habitName'),
+                emojiSuggestions: S('#emojiSuggestions'), colorPalette: S('#colorPalette'),
+                dayModal: S('#dayModal'), modalDateHeader: S('#modalDateHeader'),
+                closeModalBtn: S('#closeModalBtn'), modalHabitsList: S('#modalHabitsList'),
+                dailyNote: S('#dailyNote'), settingsBtn: S('#settingsBtn'),
+                settingsModal: S('#settingsModal'), closeSettingsBtn: S('#closeSettingsBtn'),
+                themeSelector: S('#themeSelector'), currentThemeName: S('#currentThemeName'),
+                archivedHabitsList: S('#archivedHabitsList'), reviewBtn: S('#reviewBtn'),
+                reviewModal: S('#reviewModal'), closeReviewBtn: S('#closeReviewBtn'),
+                reviewHeader: S('#reviewHeader'), reviewContent: S('#reviewContent'),
+                editHabitModal: S('#editHabitModal'), closeEditModalBtn: S('#closeEditModalBtn'),
+                editHabitForm: S('#editHabitForm'), editHabitId: S('#editHabitId'),
+                editHabitEmoji: S('#editHabitEmoji'), editHabitName: S('#editHabitName'),
+                editEmojiSuggestions: S('#editEmojiSuggestions'), editColorPalette: S('#editColorPalette'),
+            };
+        },
+
+        loadData() {
+            const savedData = localStorage.getItem('gentleHabitsData');
+            if (savedData) this.data = JSON.parse(savedData);
+            else this.data.habits = [
+                { id: 1, name: 'Drink 8 glasses of water', emoji: '💧', color: '5', completed: {}, archived: false },
+                { id: 2, name: 'Read 10 pages', emoji: '📖', color: '6', completed: {}, archived: false },
+                { id: 3, name: 'Meditate for 5 minutes', emoji: '🧘', color: '8', completed: {}, archived: false },
+            ];
+        },
+
+        saveData() { localStorage.setItem('gentleHabitsData', JSON.stringify(this.data)); },
+        
+        registerEventListeners() {
+            const E = (el, event, handler) => el.addEventListener(event, handler.bind(this));
+            E(this.elements.viewToggleBtn, 'click', this.toggleView);
+            E(this.elements.prevMonthBtn, 'click', this.changeMonth(-1));
+            E(this.elements.nextMonthBtn, 'click', this.changeMonth(1));
+            E(this.elements.addHabitForm, 'submit', this.addHabit);
+            E(this.elements.calendarGrid, 'click', this.openDayModal);
+            E(this.elements.closeModalBtn, 'click', () => this.toggleModal(this.elements.dayModal, false));
+            E(this.elements.dailyNote, 'change', this.saveNote);
+            E(this.elements.settingsBtn, 'click', () => this.toggleModal(this.elements.settingsModal, true));
+            E(this.elements.closeSettingsBtn, 'click', () => this.toggleModal(this.elements.settingsModal, false));
+            E(this.elements.reviewBtn, 'click', this.showReview);
+            E(this.elements.closeReviewBtn, 'click', () => this.toggleModal(this.elements.reviewModal, false));
+            E(this.elements.editHabitForm, 'submit', this.saveHabitChanges);
+            E(this.elements.closeEditModalBtn, 'click', () => this.toggleModal(this.elements.editHabitModal, false));
+            this.elements.habitsList.addEventListener('click', e => {
+                if (e.target.closest('.edit-btn')) this.editHabitEvent(e);
+                if (e.target.closest('.habit-tracker-circle')) this.toggleHabitCompletionEvent(e);
+                if (e.target.closest('.delete-btn')) this.deleteHabitEvent(e);
+                if (e.target.closest('.archive-btn')) this.archiveHabitEvent(e);
+            });
+            this.elements.emojiSuggestions.addEventListener('click', e => { if (e.target.tagName === 'BUTTON') { this.elements.habitEmoji.value = e.target.textContent; } });
+            this.elements.colorPalette.addEventListener('click', e => { if (e.target.closest('.color-dot')) { this.elements.colorPalette.querySelectorAll('.color-dot').forEach(d => d.classList.remove('ring-2', 'ring-offset-2', 'ring-dark')); e.target.closest('.color-dot').classList.add('ring-2', 'ring-offset-2', 'ring-dark'); } });
+            this.elements.editEmojiSuggestions.addEventListener('click', e => { if (e.target.tagName === 'BUTTON') { this.elements.editHabitEmoji.value = e.target.textContent; } });
+            this.elements.editColorPalette.addEventListener('click', e => { if (e.target.closest('.color-dot')) { this.elements.editColorPalette.querySelectorAll('.color-dot').forEach(d => d.classList.remove('ring-2', 'ring-offset-2', 'ring-dark')); e.target.closest('.color-dot').classList.add('ring-2', 'ring-offset-2', 'ring-dark'); } });
+        },
+        
+        render() { this.updateDate(); this.renderHabits(); this.renderCalendar(); this.renderSettings(); },
+        updateDate() { this.elements.currentDate.textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); this.currentDayIndex = new Date().getDay(); },
+        toggleView() { this.currentView = this.currentView === 'list' ? 'calendar' : 'list'; this.elements.listView.classList.toggle('hidden'); this.elements.calendarView.classList.toggle('hidden'); this.elements.viewToggleBtn.textContent = this.currentView === 'list' ? 'Switch to Calendar View' : 'Switch to List View'; },
+        
+        addHabit(e) {
+            e.preventDefault();
+            const name = this.elements.habitName.value.trim();
+            if (!name) return;
+            const emoji = this.elements.habitEmoji.value.trim() || '✨';
+            const color = this.elements.colorPalette.querySelector('.ring-2')?.dataset.color || '1';
+            this.data.habits.push({ id: Date.now(), name, emoji, color, completed: {}, archived: false });
+            this.saveData();
+            this.render();
+            // Forcefully clear the input fields
+            this.elements.addHabitForm.reset();
+            this.elements.habitName.value = '';
+            this.elements.habitEmoji.value = '';
+            this.elements.colorPalette.querySelectorAll('.color-dot').forEach(d => d.classList.remove('ring-2', 'ring-offset-2', 'ring-dark'));
+            this.elements.colorPalette.querySelector('[data-color="1"]').classList.add('ring-2', 'ring-offset-2', 'ring-dark');
+        },
+
+        toggleHabitCompletion(habitId, dateString) { const habit = this.data.habits.find(h => h.id === habitId); if (!habit) return; if (habit.completed[dateString]) delete habit.completed[dateString]; else habit.completed[dateString] = true; this.saveData(); this.render(); if (this.checkAllHabitsCompleted(dateString)) this.triggerCelebration(); },
+        deleteHabit(habitId) { this.data.habits = this.data.habits.filter(h => h.id !== habitId); this.saveData(); this.render(); },
+        archiveHabit(habitId, restore = false) { const source = restore ? this.data.archivedHabits : this.data.habits; const dest = restore ? this.data.habits : this.data.archivedHabits; const index = source.findIndex(h => h.id === habitId); if (index > -1) { const [habit] = source.splice(index, 1); habit.archived = !restore; dest.push(habit); this.saveData(); this.render(); } },
+        openEditModal(habitId) { const habit = this.data.habits.find(h => h.id === habitId); if (!habit) return; this.elements.editHabitId.value = habit.id; this.elements.editHabitName.value = habit.name; this.elements.editHabitEmoji.value = habit.emoji; this.elements.editColorPalette.querySelectorAll('.color-dot').forEach(d => { const isSelected = d.dataset.color === habit.color; d.classList.toggle('ring-2', isSelected); d.classList.toggle('ring-offset-2', isSelected); d.classList.toggle('ring-dark', isSelected); }); this.toggleModal(this.elements.editHabitModal, true); },
+        saveHabitChanges(e) { e.preventDefault(); const id = parseInt(this.elements.editHabitId.value); const habit = this.data.habits.find(h => h.id === id); if (habit) { habit.name = this.elements.editHabitName.value.trim(); habit.emoji = this.elements.editHabitEmoji.value.trim() || '✨'; habit.color = this.elements.editColorPalette.querySelector('.ring-2')?.dataset.color || '1'; this.saveData(); this.render(); } this.toggleModal(this.elements.editHabitModal, false); },
+        renderHabits() {
+            this.elements.habitsList.innerHTML = this.data.habits.filter(h => !h.archived).length === 0 ? `<div class="text-center text-light p-8 bg-card rounded-2xl"><p>No habits yet. Add one below!</p></div>` : '';
+            const today = new Date(), startOfWeek = new Date(today); startOfWeek.setDate(startOfWeek.getDate() - this.currentDayIndex);
+            this.data.habits.filter(h => !h.archived).forEach(habit => {
+                const row = document.createElement('div'); row.className = 'group flex items-center gap-2'; row.dataset.habitId = habit.id;
+                let trackerHTML = '', currentDay = new Date(startOfWeek);
+                for (let i = 0; i < 7; i++) { const dateStr = this.getDateString(currentDay); trackerHTML += `<div data-date="${dateStr}" class="habit-tracker-circle flex-shrink-0 ${habit.completed[dateStr] ? 'filled' : ''} ${this.getDateString(new Date()) === dateStr ? 'current-day-ring' : ''}" style="background-color: ${habit.completed[dateStr] ? `var(--color-${habit.color})` : 'transparent'}"></div>`; currentDay.setDate(currentDay.getDate() + 1); }
+                const dayLabels = ['S','M','T','W','T','F','S'].map(d => `<div class="w-6 text-center text-xs text-light">${d}</div>`).join('');
+                row.innerHTML = `<div class="habit-card-background p-4 rounded-2xl designed-outline flex-grow flex items-center gap-3"><div class="text-3xl">${habit.emoji}</div><div class="flex-grow"><p class="font-medium text-dark" title="${habit.name}">${habit.name}</p>${this.calculateStreak(habit) > 0 ? `<p class="text-xs text-light">🔥 ${this.calculateStreak(habit)} day streak</p>` : ''}</div><div class="flex flex-shrink-0 flex-col"><div class="flex space-x-1.5 mb-1 justify-center">${dayLabels}</div><div class="flex space-x-1.5">${trackerHTML}</div></div></div><div class="flex flex-shrink-0 flex-col gap-1"><button class="edit-btn text-light hover:text-dark transition-colors w-7 h-7 flex items-center justify-center rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l24-24L216,84.68Z"></path></svg></button><button class="archive-btn text-light hover:text-dark transition-colors w-7 h-7 flex items-center justify-center rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,16V74.3l-82.5,55a8,8,0,0,1-7,0L40,74.3V56ZM40,200V90.4l82.5,55a8,8,0,0,0,7,0L216,90.4V200Z"></path></svg></button><button class="delete-btn text-light hover:text-red-500 transition-colors w-7 h-7 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"></path></svg></button></div>`;
+                this.elements.habitsList.appendChild(row);
+            });
+        },
+        renderCalendar() { const date = this.calendarDate; const month = date.getMonth(), year = date.getFullYear(); this.elements.monthYearHeader.textContent = `${date.toLocaleString('default', { month: 'long' })} ${year}`; this.elements.calendarGrid.innerHTML = ''; const firstDay = new Date(year, month, 1).getDay(); const daysInMonth = new Date(year, month + 1, 0).getDate(); const today = this.getDateString(new Date()); for (let i = 0; i < firstDay; i++) this.elements.calendarGrid.appendChild(document.createElement('div')); for (let day = 1; day <= daysInMonth; day++) { const dayEl = document.createElement('div'); const dateStr = this.getDateString(new Date(year, month, day)); dayEl.className = `calendar-day p-1 flex flex-col items-center justify-center rounded-md cursor-pointer hover:bg-primary ${dateStr === today ? 'bg-primary font-bold' : ''}`; dayEl.dataset.date = dateStr; dayEl.innerHTML = `<span class="text-xs">${day}</span><div class="flex flex-wrap justify-center gap-1 mt-1">${this.data.habits.filter(h => h.completed[dateStr]).map(h => `<div class="w-2 h-2 rounded-full" style="background-color:var(--color-${h.color})"></div>`).join('')}</div>`; this.elements.calendarGrid.appendChild(dayEl); } },
+        toggleModal(modal, show) { if (show) { modal.classList.remove('opacity-0', 'pointer-events-none'); setTimeout(() => modal.classList.add('open'), 10); } else { modal.classList.remove('open'); setTimeout(() => modal.classList.add('opacity-0', 'pointer-events-none'), 300); } },
+        openDayModal(e) { const dayEl = e.target.closest('.calendar-day'); if (!dayEl) return; const dateString = dayEl.dataset.date; const date = new Date(dateString.replace(/-/g, '/')); this.elements.modalDateHeader.textContent = date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }); this.elements.modalDateHeader.dataset.date = dateString; this.elements.dailyNote.value = this.data.notes[dateString] || ''; this.elements.modalHabitsList.innerHTML = this.data.habits.filter(h => !h.archived).map(h => `<div class="flex items-center justify-between bg-primary p-3 rounded-lg" data-habit-id="${h.id}"><div class="flex items-center gap-3"><div class="text-2xl">${h.emoji}</div><span>${h.name}</span></div><input type="checkbox" ${h.completed[dateString] ? 'checked' : ''} class="w-6 h-6 rounded-md accent-[var(--color-${h.color})]"></div>`).join(''); this.elements.modalHabitsList.querySelectorAll('input[type="checkbox"]').forEach(cb => { cb.addEventListener('change', (ev) => { this.toggleHabitCompletion(parseInt(ev.target.closest('[data-habit-id]').dataset.habitId), dateString); const calDay = this.elements.calendarGrid.querySelector(`[data-date="${dateString}"]`); if (calDay) calDay.querySelector('div').innerHTML = this.data.habits.filter(h => h.completed[dateString]).map(h => `<div class="w-2 h-2 rounded-full" style="background-color:var(--color-${h.color})"></div>`).join(''); }); }); this.toggleModal(this.elements.dayModal, true); },
+        saveNote(e) { this.data.notes[this.elements.modalDateHeader.dataset.date] = e.target.value; this.saveData(); },
+        calculateStreak(habit) { let s = 0, d = new Date(); d.setHours(0,0,0,0); if (!habit.completed[this.getDateString(d)]) d.setDate(d.getDate() - 1); while (habit.completed[this.getDateString(d)]) { s++; d.setDate(d.getDate() - 1); } return s; },
+        triggerCelebration() { const c=document.getElementById('confetti-canvas'),x=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;const p=[],f=100,g=0.5,o=['#EF4444','#F97316','#EAB308','#22C55E','#3B82F6','#8B5CF6'];for(let i=0;i<f;i++)p.push({x:Math.random()*c.width,y:Math.random()*c.height-c.height,r:Math.random()*4+1,color:o[Math.floor(Math.random()*o.length)],vx:Math.random()*4-2,vy:Math.random()*-2-2});let a;const r=()=>{x.clearRect(0,0,c.width,c.height);p.forEach((p,i)=>{p.vy+=g;p.y+=p.vy;p.x+=p.vx;if(p.y>c.height)p.splice(i,1);x.fillStyle=p.color;x.beginPath();x.arc(p.x,p.y,p.r,0,2*Math.PI,false);x.fill()});if(p.length>0)a=requestAnimationFrame(r);else{x.clearRect(0,0,c.width,c.height);cancelAnimationFrame(a)}};r() },
+        renderSettings() { this.elements.currentThemeName.textContent = this.data.settings.theme; this.elements.themeSelector.innerHTML = ''; ['warm', 'cool', 'mono'].forEach(t => { const btn = document.createElement('button'); btn.dataset.theme = t; btn.className = `capitalize w-full py-2 rounded-lg border ${this.data.settings.theme === t ? 'bg-dark text-white' : 'bg-primary border-stroke'}`; btn.textContent = t; btn.onclick = () => { this.data.settings.theme = t; this.applyTheme(); this.saveData(); this.renderSettings(); }; this.elements.themeSelector.appendChild(btn); }); this.elements.archivedHabitsList.innerHTML = this.data.archivedHabits.length > 0 ? this.data.archivedHabits.map(h => `<div class="flex items-center justify-between bg-primary p-2 rounded-lg text-sm"><span>${h.emoji} ${h.name}</span><button data-habit-id="${h.id}" class="restore-btn text-light hover:text-dark font-medium p-1">Restore</button></div>`).join('') : '<p class="text-xs text-light text-center">No archived habits.</p>'; this.elements.archivedHabitsList.querySelectorAll('.restore-btn').forEach(btn => btn.onclick = (e) => this.archiveHabit(parseInt(e.target.dataset.habitId), true)); },
+        applyTheme() { document.body.className = `bg-primary text-dark habit-colors theme-${this.data.settings.theme}`; },
+        showReview() { const today = new Date(), lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1); this.elements.reviewHeader.textContent = `Review for ${lastMonth.toLocaleString('default', { month: 'long' })} ${lastMonth.getFullYear()}`; const reviewData = this.generateReviewData(lastMonth.getFullYear(), lastMonth.getMonth()); this.elements.reviewContent.innerHTML = `<div class="bg-primary p-3 rounded-lg"><p class="text-sm text-light">Most Consistent</p><p class="font-semibold text-lg">${reviewData.mostConsistent || 'N/A'}</p></div><div class="bg-primary p-3 rounded-lg"><p class="text-sm text-light">Longest Streak</p><p class="font-semibold text-lg">${reviewData.longestStreak} days</p></div><div><h4 class="text-sm font-medium text-light mb-2">Completion Summary</h4><div class="space-y-1">${reviewData.completions.map(i => `<div class="text-sm flex justify-between"><span>${i.name}</span><span>${i.count} times</span></div>`).join('') || '<p class="text-xs text-light text-center">No habits tracked.</p>'}</div></div>`; this.toggleModal(this.elements.reviewModal, true); },
+        generateReviewData(year, month) { let mostConsistent = null, maxCount = 0, longestStreak = 0; const completions = [...this.data.habits, ...this.data.archivedHabits].map(h => { const count = Object.keys(h.completed).filter(d => { const date = new Date(d.replace(/-/g, '/')); return date.getFullYear() === year && date.getMonth() === month; }).length; if (count > maxCount) { maxCount = count; mostConsistent = `${h.emoji} ${h.name}`; } const currentStreak = this.calculateStreak(h); if (currentStreak > longestStreak) longestStreak = currentStreak; return { name: `${h.emoji} ${h.name}`, count }; }); return { mostConsistent, longestStreak, completions }; },
+        getDateString(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; },
+        changeMonth(o) { return () => { this.calendarDate.setMonth(this.calendarDate.getMonth() + o); this.renderCalendar(); }; },
+        checkAllHabitsCompleted(d) { const a = this.data.habits.filter(h => !h.archived); return a.length > 0 && a.every(h => h.completed[d]); },
+        editHabitEvent(e) { this.openEditModal(parseInt(e.target.closest('[data-habit-id]').dataset.habitId)); },
+        deleteHabitEvent(e) { this.deleteHabit(parseInt(e.target.closest('[data-habit-id]').dataset.habitId)); },
+        archiveHabitEvent(e) { this.archiveHabit(parseInt(e.target.closest('[data-habit-id]').dataset.habitId), false); },
+        toggleHabitCompletionEvent(e) { this.toggleHabitCompletion(parseInt(e.target.closest('[data-habit-id]').dataset.habitId), e.target.closest('[data-date]').dataset.date); },
+        renderColorPalette(container) { let html = ''; for (let i = 1; i <= 8; i++) { html += `<button type="button" class="color-dot w-8 h-8 rounded-full ${i === 1 ? 'ring-2 ring-offset-2 ring-dark' : ''}" data-color="${i}" style="background-color: var(--color-${i})"></button>`; } container.innerHTML = html; }
+    });
+    
+    document.addEventListener('DOMContentLoaded', () => App.init());
+</script>
+</body>
+</html>
