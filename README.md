@@ -28,13 +28,12 @@ This project is a demonstration of what's possible with modern web technologies 
 
 1. Live Version:
 You can use the live version of the app here:
-[Link to your live app] <- Add your Firebase Hosting URL here!
+https://habittrackerdeploy-hij2g2wmo-chiku014s-projects.vercel.app/
 
-2. Local Version:
-file:///E:/Desktop%20to%20E%20drive/Projects/HabitTracker/habit_tracker.html
-Open it in any modern web browser.
-
-3. Installing the App
+2. Installing the App
 Open the live URL on your phone or computer.
 On your phone, tap the "Share" or "Menu" button and select "Add to Home Screen" or "Install App".
 On your desktop (using Chrome/Edge), click the install icon in the address bar.
+
+An visual Infographic of HabitTracker App:
+https://habittrackerdeploy.vercel.app/
