@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker - A Visual Tour</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Energetic & Playful -->
+    <!-- Application Structure Plan: The SPA is designed as a top-to-bottom narrative scroll, telling the story of the Habit Tracker. It begins with a strong "Hero" section stating the app's core philosophy. The main body is a multi-column grid dedicated to visualizing each key feature from the README, using a mix of large stats, charts, and descriptive text to keep it engaging. This is followed by a "Tech Stack" section that uses a styled HTML flow diagram to explain the technology simply. It concludes with a clear "How to Use" section. This structure was chosen to guide the user from the "why" (philosophy) to the "what" (features) and finally the "how" (tech and usage), creating a logical and easy-to-digest journey. -->
+    <!-- Visualization & Content Choices:
+        - Hero Stats (Inform): Big numbers for immediate impact.
+        - Privacy (Inform): Donut Chart via Chart.js to strongly convey the 100% local data storage.
+        - App Capabilities (Compare): Horizontal Bar Chart via Chart.js to visually confirm that both offline and online modes have full functionality.
+        - Theme Showcase (Organize): Styled HTML divs to represent the themes, which is more direct than a chart.
+        - Tech Stack (Organize): A flowchart made with structured HTML/CSS and Tailwind, as Mermaid/SVG are prohibited. This clearly shows the relationship between technologies.
+        - How to Use (Organize): A styled list provides clear, sequential instructions. This structure logically presents the information from the README in a visually appealing and understandable format.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F9FA; /* Light Grey Background */
+            color: #343A40; /* Dark Grey Text */
+        }
+        .palette-bg { background-color: #0D3B66; } /* Deep Blue */
+        .palette-text-light { color: #FAF0CA; } /* Cream */
+        .palette-text-accent { color: #F95738; } /* Orange Red */
+        .palette-accent { background-color: #F95738; }
+        .palette-secondary { background-color: #EE964B; } /* Orange */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 350px;
+        }
+        @media (min-width: 768px) {
+            .chart-container { height: 350px; }
+        }
+        .flow-diagram-item {
+            background-color: white;
+            border: 2px solid #0D3B66;
+            color: #0D3B66;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .flow-diagram-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #F95738;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <main class="container mx-auto p-4 md:p-8">
+
+        <!-- Header Section -->
+        <header class="text-center py-12">
+            <h1 class="text-4xl md:text-6xl font-black palette-bg palette-text-light p-4 rounded-lg inline-block">Habit Tracker</h1>
+            <p class="mt-4 text-lg md:text-xl max-w-3xl mx-auto">A gentle, minimalist, and offline-first habit tracker designed to feel like a personal journal, not a game to be won.</p>
+        </header>
+
+        <!-- Key Features Section -->
+        <section class="py-12">
+            <h2 class="text-3xl font-bold text-center mb-12">What Makes It Special?</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Card: 100% Private -->
+                <div class="bg-white rounded-lg shadow-md p-6 flex flex-col">
+                    <h3 class="text-xl font-bold mb-2">100% Free & Private</h3>
+                    <p class="text-gray-600 mb-4 flex-grow">No server, no tracking, no ads. All your data stays on your device, ensuring complete privacy.</p>
+                    <div class="chart-container">
+                        <canvas id="privacyChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Card: Offline First -->
+                <div class="bg-white rounded-lg shadow-md p-6 flex flex-col">
+                    <h3 class="text-xl font-bold mb-2">Always Available</h3>
+                    <p class="text-gray-600 mb-4 flex-grow">The app is designed to work perfectly even without an internet connection, so you never miss a beat.</p>
+                    <div class="chart-container h-64 md:h-auto">
+                        <canvas id="offlineChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Card: Installable PWA -->
+                <div class="bg-white rounded-lg shadow-md p-6 flex flex-col items-center justify-center text-center">
+                    <div class="text-6xl mb-4">📲</div>
+                    <h3 class="text-xl font-bold mb-2">Installable App</h3>
+                    <p class="text-gray-600">Add the app to your phone or desktop home screen for a native, app-like experience without the app store.</p>
+                </div>
+                
+                <!-- Card: Views -->
+                <div class="bg-white rounded-lg shadow-md p-6 flex flex-col items-center justify-center text-center">
+                     <div class="text-6xl mb-4">🗓️</div>
+                    <h3 class="text-xl font-bold mb-2">Dual Views</h3>
+                    <p class="text-gray-600">Choose between a focused weekly list or a full monthly calendar to see the bigger picture of your progress.</p>
+                </div>
+                
+                <!-- Card: Streaks -->
+                <div class="bg-white rounded-lg shadow-md p-6 flex flex-col items-center justify-center text-center palette-bg palette-text-light">
+                    <h3 class="text-xl font-bold mb-2">Gentle Streaks</h3>
+                    <p class="opacity-80 mb-4">A non-gamified streak counter to gently motivate you without adding pressure.</p>
+                    <p class="text-7xl font-black palette-text-accent">🔥 21</p>
+                </div>
+
+                <!-- Card: Reflection & Review -->
+                <div class="bg-white rounded-lg shadow-md p-6 flex flex-col items-center justify-center text-center">
+                     <div class="text-6xl mb-4">✍️</div>
+                    <h3 class="text-xl font-bold mb-2">Reflect & Review</h3>
+                    <p class="text-gray-600">Add daily notes to connect habits with your mood, and get a beautiful monthly summary of your achievements.</p>
+                </div>
+
+                <!-- Card: Themes -->
+                 <div class="bg-white rounded-lg shadow-md p-6 md:col-span-2 lg:col-span-1">
+                    <h3 class="text-xl font-bold text-center mb-4">Customizable Themes</h3>
+                    <p class="text-gray-600 text-center mb-6">Personalize your experience to match your style.</p>
+                    <div class="flex justify-around items-center">
+                        <div class="text-center">
+                            <div class="w-16 h-16 rounded-full mx-auto" style="background-color: #FFF7F0; border: 4px solid #5C3D2E;"></div>
+                            <p class="mt-2 font-semibold">Warm</p>
+                        </div>
+                         <div class="text-center">
+                            <div class="w-16 h-16 rounded-full mx-auto" style="background-color: #F0F7FF; border: 4px solid #2E4A5C;"></div>
+                            <p class="mt-2 font-semibold">Cool</p>
+                        </div>
+                         <div class="text-center">
+                            <div class="w-16 h-16 rounded-full mx-auto" style="background-color: #F5F5F5; border: 4px solid #212121;"></div>
+                            <p class="mt-2 font-semibold">Mono</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Tech Stack Section -->
+        <section class="py-12">
+            <h2 class="text-3xl font-bold text-center mb-12">The Technology Behind It</h2>
+            <div class="max-w-4xl mx-auto">
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-9 gap-4 items-center">
+                    <div class="flow-diagram-item col-span-2 lg:col-span-2">HTML5 & CSS3</div>
+                    <div class="flow-diagram-arrow col-span-2 lg:col-span-1">→</div>
+                    <div class="flow-diagram-item col-span-2 lg:col-span-2">JavaScript</div>
+                    <div class="flow-diagram-arrow col-span-2 lg:col-span-1">→</div>
+                    <div class="flow-diagram-item col-span-2 lg:col-span-3">Progressive Web App (PWA)</div>
+                </div>
+                 <p class="text-center text-gray-600 mt-4">A powerful, modern application built with simple, robust web technologies—no complex frameworks needed.</p>
+            </div>
+        </section>
+
+        <!-- How to Use Section -->
+        <section class="py-12 palette-bg rounded-lg">
+            <h2 class="text-3xl font-bold text-center mb-8 palette-text-light">Get Started in Seconds</h2>
+            <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center palette-text-light">
+                <div>
+                    <p class="palette-text-accent text-5xl font-black mb-2">1</p>
+                    <h3 class="text-xl font-bold mb-2">Download or Visit</h3>
+                    <p class="opacity-80">Download the single HTML file or visit the live URL.</p>
+                </div>
+                <div>
+                    <p class="palette-text-accent text-5xl font-black mb-2">2</p>
+                    <h3 class="text-xl font-bold mb-2">Open in Browser</h3>
+                    <p class="opacity-80">Open the file or URL in any modern browser on any device.</p>
+                </div>
+                <div>
+                    <p class="palette-text-accent text-5xl font-black mb-2">3</p>
+                    <h3 class="text-xl font-bold mb-2">Install the App</h3>
+                    <p class="opacity-80">Use the "Add to Home Screen" or "Install" option in your browser for the full app experience.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const chartJsDefaults = {
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#343A40',
+                            font: {
+                                family: "'Inter', sans-serif",
+                                size: 14,
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: function(tooltipItems) {
+                                const item = tooltipItems[0];
+                                let label = item.chart.data.labels[item.dataIndex];
+                                if (Array.isArray(label)) {
+                                  return label.join(' ');
+                                } else {
+                                  return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            
+            // Privacy Chart
+            const privacyCtx = document.getElementById('privacyChart');
+            if(privacyCtx) {
+                new Chart(privacyCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Stored on Your Device', 'Stored on a Server'],
+                        datasets: [{
+                            label: 'Data Storage',
+                            data: [100, 0],
+                            backgroundColor: ['#0D3B66', '#F95738'],
+                            borderColor: '#ffffff',
+                            borderWidth: 4
+                        }]
+                    },
+                    options: {
+                        ...chartJsDefaults,
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '70%',
+                    }
+                });
+            }
+
+            // Offline Chart
+            const offlineCtx = document.getElementById('offlineChart');
+            if(offlineCtx) {
+                 new Chart(offlineCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Online Mode', 'Offline Mode'],
+                        datasets: [{
+                            label: 'Feature Availability',
+                            data: [100, 100],
+                            backgroundColor: ['#EE964B', '#0D3B66'],
+                            barThickness: 50,
+                        }]
+                    },
+                    options: {
+                        ...chartJsDefaults,
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + '%'
+                                    },
+                                    color: '#343A40'
+                                }
+                            },
+                            y: {
+                                ticks: {
+                                    color: '#343A40'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
