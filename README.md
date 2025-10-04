@@ -28,7 +28,7 @@ This project is a demonstration of what's possible with modern web technologies 
 
 1. Live Version:
 You can use the live version of the app here:
-https://habittrackerdeploy-hij2g2wmo-chiku014s-projects.vercel.app/
+https://habtradeploy-grtv.vercel.app/
 
 2. Installing the App
 Open the live URL on your phone or computer.
